@@ -7,7 +7,9 @@ This repo implements a simple API in laravel that accomplishes the following req
 - [Users can view a list of their own pdf files and the others in json.
 - [User with the right token can view or download (depends where the request is made) pdf files, and, if file has a password, it has to be specified on the request.
 
-## Important: This project uses a symmlink 'storage' at public folder. please create that before using it.
+
+### Important: This project uses a symmlink 'storage' at public folder. please create that before using it.
+
 
 ## Steps
 
@@ -18,12 +20,67 @@ This repo implements a simple API in laravel that accomplishes the following req
 5. View (using the browser) or download (Postman, e.g.) a file using **GET to api/pdf_files/view/{id}** and passing api_token:yourApiToken, pdf_password:yourPdfPassword on the body.
 6. Delete a pfd_file using **POST to api/pdf_files/delete/{id}** and passing api_token:yourApiToken, pdf_password:yourPdfPassword on the body.
 
+
 ### Security concerns
+
 1. Token based would be better using Oauth2.0.
 2. Because of simple authentication, it is suggested to implement using SSL (HTTPS).
 3. Hashing passwords for pdf_files would also be imprtant, bu because we don't wanna loose access to a file, that was omitted.
 4. Storage Folder may be accessible using a regular shared folder or it can be easily hijacked. Best case scenario would be to store it on a VPS or even using a cloud sotrage solution such as S3 and Google Storage and using SSL with OAuth2.0 to upload/fetch files.
 5. User authentication could also be improved.
+6. SQL Injection was not taken care of.
+
+
+## API Endpoints
+<table>
+<thead>
+    <tr>
+    <th>Action</th>
+    <th>Method</th>
+    <th>URI</th>
+    <th>Request Body Content</th>
+    </tr>
+</thead>
+<tbody>
+    <tr>
+    <td>Store File</td>
+    <td>POST</td>
+    <td>api/pdf_file</td>
+    <td>title (string), pdf_file (mime application/pdf), api_token (string), pdf_password (string, optional)</td>
+    </tr>
+    <tr>
+    <td>List Files</td>
+    <td>GET</td>
+    <td>api/pdf_files</td>
+    <td>api_token (string)</td>
+    </tr>
+    <tr>
+    <td>List Single File</td>
+    <td>GET</td>
+    <td>api/pdf_files/{id}</td>
+    <td>api_token (string)</td>
+    </tr>
+    <tr>
+    <td>View/Download Single File</td>
+    <td>GET</td>
+    <td>api/pdf_files/view/{id}</td>
+    <td>api_token (string), pdf_password (string, optional)</td>
+    </tr>
+    <tr>
+    <td>Delete File</td>
+    <td>POST</td>
+    <td>api/pdf_files/delete/{id}</td>
+    <td>api_token (string), pdf_password (string, optional)</td>
+    </tr>
+    <tr>
+    <td>View User Resource</td>
+    <td>POST</td>
+    <td>api/user</td>
+    <td>api_token (string)</td>
+    </tr>
+</tbody>
+</table>
+
 
 ## API Endpoints from php artisan
 
