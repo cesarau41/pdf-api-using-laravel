@@ -1,71 +1,50 @@
-<p align="center"><img src="https://laravel.com/assets/img/components/logo-laravel.svg"></p>
+## About this repo
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/d/total.svg" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/v/stable.svg" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/license.svg" alt="License"></a>
-</p>
+This repo implements a simple API in laravel that accomplishes the following requirements
+- [Allow user to register on the website and receive a token for API Authentication.
+- [After, using simple Bearer Token Authentication built in with Laravel, user can upload multiple pdf files (one for each HTTP Request).
+- [PDF Files must have a title and can contain an optional passsword for "extra security".
+- [Users can view a list of their own pdf files and the others in json.
+- [User with the right token can view or download (depends where the request is made) pdf files, and, if file has a password, it has to be specified on the request.
 
-## About Laravel
+## Important: This project uses a symmlink 'storage' at public folder. please create that before using it.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Steps
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+1. **Register using /login**. You will receive a token that will be used for the next steps.
+2. Upload a pdf file (it has to be a pdf file) using a **POST to /api/pdf_file** with body (key:value) title:yourTitle, pdf_file:file (if using Postman, change from text to file and attach your file), api_token:yourApiToken, pdf_password:yourPdfPassword. Response will be the PDF_File Resource associated with your file
+3. List all your pdf files using **GET to /api/pdf_files** and providing api_token:yourApiToken on the body.
+4. List one specific file using **GET to /api/pdf_files/{id}** replacing {id} by the file id you wanna see and providing api_token:yourApiToken on the body.
+5. View (using the browser) or download (Postman, e.g.) a file using **GET to api/pdf_files/view/{id}** and passing api_token:yourApiToken, pdf_password:yourPdfPassword on the body.
+6. Delete a pfd_file using **POST to api/pdf_files/delete/{id}** and passing api_token:yourApiToken, pdf_password:yourPdfPassword on the body.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### Security concerns
+1. Token based would be better using Oauth2.0.
+2. Because of simple authentication, it is suggested to implement using SSL (HTTPS).
+3. Hashing passwords for pdf_files would also be imprtant, bu because we don't wanna loose access to a file, that was omitted.
+4. Storage Folder may be accessible using a regular shared folder or it can be easily hijacked. Best case scenario would be to store it on a VPS or even using a cloud sotrage solution such as S3 and Google Storage and using SSL with OAuth2.0 to upload/fetch files.
+5. User authentication could also be improved.
 
-## Learning Laravel
+## API Endpoints from php artisan
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 1100 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost you and your team's skills by digging into our comprehensive video library.
-
-## Laravel Sponsors
-
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
-
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[British Software Development](https://www.britishsoftware.co)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- [UserInsights](https://userinsights.com)
-- [Fragrantica](https://www.fragrantica.com)
-- [SOFTonSOFA](https://softonsofa.com/)
-- [User10](https://user10.com)
-- [Soumettre.fr](https://soumettre.fr/)
-- [CodeBrisk](https://codebrisk.com)
-- [1Forge](https://1forge.com)
-- [TECPRESSO](https://tecpresso.co.jp/)
-- [Runtime Converter](http://runtimeconverter.com/)
-- [WebL'Agence](https://weblagence.com/)
-- [Invoice Ninja](https://www.invoiceninja.com)
-- [iMi digital](https://www.imi-digital.de/)
-- [Earthlink](https://www.earthlink.ro/)
-- [Steadfast Collective](https://steadfastcollective.com/)
-- [We Are The Robots Inc.](https://watr.mx/)
-- [Understand.io](https://www.understand.io/)
-- [Abdel Elrafa](https://abdelelrafa.com)
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-source software licensed under the [MIT license](https://opensource.org/licenses/MIT).
++--------+----------+---------------------------+------------------+------------------------------------------------------------------------+--------------+
+| Domain | Method   | URI                       | Name             | Action                                                                 | Middleware   |
++--------+----------+---------------------------+------------------+------------------------------------------------------------------------+--------------+
+|        | GET|HEAD | /                         |                  | Closure                                                                | web          |
+|        | POST     | api/pdf_file              |                  | App\Http\Controllers\PDFFileController@store                           | api,auth:api |
+|        | GET|HEAD | api/pdf_files             |                  | App\Http\Controllers\PDFFileController@index                           | api,auth:api |
+|        | POST     | api/pdf_files/delete/{id} |                  | App\Http\Controllers\PDFFileController@destroy                         | api,auth:api |
+|        | GET|HEAD | api/pdf_files/view/{id}   |                  | App\Http\Controllers\PDFFileController@view                            | api,auth:api |
+|        | GET|HEAD | api/pdf_files/{id}        |                  | App\Http\Controllers\PDFFileController@show                            | api,auth:api |
+|        | GET|HEAD | api/user                  |                  | Closure                                                                | api,auth:api |
+|        | GET|HEAD | home                      | home             | App\Http\Controllers\HomeController@index                              | web,auth     |
+|        | POST     | login                     |                  | App\Http\Controllers\Auth\LoginController@login                        | web,guest    |
+|        | GET|HEAD | login                     | login            | App\Http\Controllers\Auth\LoginController@showLoginForm                | web,guest    |
+|        | POST     | logout                    | logout           | App\Http\Controllers\Auth\LoginController@logout                       | web          |
+|        | POST     | password/email            | password.email   | App\Http\Controllers\Auth\ForgotPasswordController@sendResetLinkEmail  | web,guest    |
+|        | GET|HEAD | password/reset            | password.request | App\Http\Controllers\Auth\ForgotPasswordController@showLinkRequestForm | web,guest    |
+|        | POST     | password/reset            | password.update  | App\Http\Controllers\Auth\ResetPasswordController@reset                | web,guest    |
+|        | GET|HEAD | password/reset/{token}    | password.reset   | App\Http\Controllers\Auth\ResetPasswordController@showResetForm        | web,guest    |
+|        | GET|HEAD | register                  | register         | App\Http\Controllers\Auth\RegisterController@showRegistrationForm      | web,guest    |
+|        | POST     | register                  |                  | App\Http\Controllers\Auth\RegisterController@register                  | web,guest    |
++--------+----------+---------------------------+------------------+------------------------------------------------------------------------+--------------+
